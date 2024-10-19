@@ -2,11 +2,15 @@ package vn.hoidanit.laptopshop.controller.admin;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.service.UploadService;
 import vn.hoidanit.laptopshop.service.UserService;
@@ -16,18 +20,13 @@ public class UserController {
     // DI: Dependency Injection
     private final UserService userService;
     private final UploadService uploadService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, UploadService uploadService) {
+    public UserController(UserService userService, UploadService uploadService,
+            PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.uploadService = uploadService;
-    }
-
-    @RequestMapping("/")
-    public String getHomePage(Model model) {
-        List<User> arrUsers = this.userService.getAllUsers();
-        System.out.println(arrUsers);
-        model.addAttribute("eric", "test");
-        return "hello";
+        this.passwordEncoder = passwordEncoder;
     }
 
     @RequestMapping("/admin/user")
@@ -51,10 +50,27 @@ public class UserController {
     }
 
     @PostMapping(value = "/admin/user/create")
-    public String createUserPage(Model model, @ModelAttribute("newUser") User user,
+    public String createUserPage(Model model,
+            @ModelAttribute("newUser") @Valid User user,
+            BindingResult newUserBindingResult,
             @RequestParam("uploadFile") MultipartFile file) {
+        // validate
+        List<FieldError> errors = newUserBindingResult.getFieldErrors();
+        for (FieldError error : errors) {
+            System.out.println(error.getField() + " - " + error.getDefaultMessage());
+        }
+
+        if (newUserBindingResult.hasErrors()) {
+            return "admin/user/create";
+        }
+
+        //
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatar");
-        // userService.handleSaveUser(user);
+        String hashPassword = passwordEncoder.encode(user.getPassword());
+        user.setAvatar(avatar);
+        user.setPassword(hashPassword);
+        user.setRole(this.userService.getRoleByName(user.getRole().getName()));
+        this.userService.handleSaveUser(user);
         return "redirect:/admin/user";
     }
 

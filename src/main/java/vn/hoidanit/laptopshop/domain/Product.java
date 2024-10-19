@@ -4,8 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "products")
@@ -14,14 +16,26 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
+    @Size(min = 3, message = "Name phải có tối thiểu 3 ký tự")
     private String name;
+
+    @NotNull
+    @Min(value = 100, message = "Giá sản phẩm tối thiểu là $100")
     private double price;
     private String image;
     private String detailDesc;
     private String shortDesc;
+
+    @NotNull
+    @Min(value = 1, message = "Vui lòng nhập số lượng")
     private long quantity;
     private long sold;
+
+    @NotNull
     private String factory;
+
+    @NotNull
     private String target;
 
     public long getId() {
