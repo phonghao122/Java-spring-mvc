@@ -8,7 +8,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import vn.hoidanit.laptopshop.domain.Product;
-import vn.hoidanit.laptopshop.domain.Product;
 import vn.hoidanit.laptopshop.service.ProductService;
 import vn.hoidanit.laptopshop.service.UploadService;
 
@@ -69,8 +68,10 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/update")
-    public String postProductUpdate(Model model, @ModelAttribute("newProduct") @Valid Product product,
-            BindingResult newProductBindingResult) {
+    public String postProductUpdate(Model model,
+            @ModelAttribute("newProduct") @Valid Product product,
+            BindingResult newProductBindingResult,
+            @RequestParam("uploadFile") MultipartFile file) {
         // validate
         List<FieldError> errors = newProductBindingResult.getFieldErrors();
         for (FieldError error : errors) {
@@ -80,6 +81,7 @@ public class ProductController {
         if (newProductBindingResult.hasErrors()) {
             return "admin/product/update";
         }
+        String image = this.uploadService.handleSaveUploadFile(file, "product");
         Product crrProduct = this.productService.getProductById(product.getId());
         crrProduct.setName(product.getName());
         crrProduct.setDetailDesc(product.getDetailDesc());
@@ -88,6 +90,7 @@ public class ProductController {
         crrProduct.setQuantity(product.getQuantity());
         crrProduct.setShortDesc(product.getShortDesc());
         crrProduct.setTarget(product.getTarget());
+        crrProduct.setImage(image);
         this.productService.handleSaveProduct(crrProduct);
         return "redirect:/admin/product";
     }
@@ -106,6 +109,13 @@ public class ProductController {
             this.productService.handleDeleteProduct(currentProduct);
         }
         return "redirect:/admin/product";
+    }
+
+    @GetMapping("/admin/product/detail/{id}")
+    public String getProductDetailPage(Model model, @PathVariable long id) {
+        Product product = this.productService.getProductById(id);
+        model.addAttribute("product", product);
+        return "admin/product/detail";
     }
 
 }
