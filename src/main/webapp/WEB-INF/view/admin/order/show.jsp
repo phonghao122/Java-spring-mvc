@@ -27,7 +27,69 @@
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item active">Order</li>
                             </ol>
-                            <div>order</div>
+                            <div class="row">
+                                <div class="mx-auto">
+                                    <div class="d-flex justify-content-between">
+                                        <h3>Table orders</h3>
+                                    </div>
+                                    <hr>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">ID</th>
+                                                <th scope="col">Total Price</th>
+                                                <th scope="col">User</th>
+                                                <th scope="col">Status</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="order" items="${orders}">
+                                                <tr>
+                                                    <th scope="row">${order.id}</th>
+                                                    <td>${order.totalPrice}</td>
+                                                    <td>${order.user.fullname}</td>
+                                                    <td>${order.status}</td>
+                                                    <td>
+                                                        <a href="/admin/order/${order.id}"
+                                                            class="btn btn-success">View</a>
+                                                        <a href="/admin/order/update/${order.id}"
+                                                            class="btn btn-warning mx-2">Update</a>
+                                                        <a href="/admin/order/delete/${order.id}"
+                                                            class="btn btn-danger">Delete</a>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+
+
+
+                                        </tbody>
+                                    </table>
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item">
+                                                <a class="page-link ${1 eq currentPage ? 'disabled' : ''}"
+                                                    href="/admin/order?page=${currentPage - 1}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <c:forEach begin="0" end="${totalPages - 1}" varStatus="loop">
+                                                <li class="page-item"><a
+                                                        class="page-link ${loop.index + 1 eq currentPage ? 'active' : ''}"
+                                                        href="/admin/order?page=${loop.index + 1}">${loop.index +
+                                                        1}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li class="page-item">
+                                                <a class="page-link ${currentPage eq totalPages ? 'disabled' : ''}"
+                                                    href="/admin/order?page=${currentPage + 1}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
                         </div>
                     </main>
                     <jsp:include page="../layout/footer.jsp" />

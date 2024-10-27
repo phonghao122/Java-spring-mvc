@@ -7,17 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import vn.hoidanit.laptopshop.domain.Product;
+import vn.hoidanit.laptopshop.domain.Order;
+import vn.hoidanit.laptopshop.domain.User;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findAll();
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    Order findById(long id);
 
-    Product save(Product product);
+    List<Order> findByUser(User user);
 
-    Product findById(long id);
-
-    void deleteById(long id);
-
-    Page<Product> findAll(Pageable page);
+    Page<Order> findAll(Pageable pageable);
 }
